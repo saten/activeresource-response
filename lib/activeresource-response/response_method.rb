@@ -15,10 +15,13 @@ module ActiveresourceResponse
           alias #{method}_without_http_response #{method}
           def #{method}(*arguments)
             result = #{method}_without_http_response(*arguments)
-            result.instance_variable_set(:@http_response, connection.http_response)
-            def result.#{method_name} 
+	    begin
+              result.instance_variable_set(:@http_response, connection.http_response)
+            rescue
+	    end
+	    def result.#{method_name} 
               @http_response
-            end   
+            end
             result
           end
           EOS
