@@ -11,17 +11,18 @@ module ActiveresourceResponse
 
         remove_response_method  if methods.map(&:to_sym).include?(:find_without_http_response)
         [:find, :get].each do |method| 
-          instance_eval  <<-EOS
+	  instance_eval  <<-EOS
           alias #{method}_without_http_response #{method}
           def #{method}(*arguments)
             result = #{method}_without_http_response(*arguments)
 	    begin
               result.instance_variable_set(:@http_response, connection.http_response)
-            rescue
-	    end
 	    def result.#{method_name} 
               @http_response
             end
+            rescue Exception => e
+		#this should happen if the response is of a class that does not allow the definition of the http_response method
+	    end
             result
           end
           EOS
